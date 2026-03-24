@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import type { User } from '@supabase/supabase-js'
 
 import UploadForm from '@/components/dashboard/upload-form'
+import StudyMaterialsLibrary from '@/components/dashboard/study-materials-library'
 import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
 
 type AspirantProfile = {
@@ -49,6 +50,15 @@ export default function DashboardClient() {
   const [profile, setProfile] = useState<AspirantProfile | null>(null)
   const [isCheckingSession, setIsCheckingSession] = useState(true)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  function handleAddMaterial() {
+    const uploadSection = document.getElementById('study-material-upload')
+
+    uploadSection?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient()
@@ -189,7 +199,10 @@ export default function DashboardClient() {
           </header>
 
           <section className="grid gap-6">
-            <UploadForm defaultExam={profile.examPreference} />
+            <StudyMaterialsLibrary onAddMaterial={handleAddMaterial} />
+            <div id="study-material-upload">
+              <UploadForm defaultExam={profile.examPreference} />
+            </div>
           </section>
         </div>
       </div>
