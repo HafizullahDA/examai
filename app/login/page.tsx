@@ -1,11 +1,16 @@
 'use client'
+
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+
+import AuthShell from '@/components/auth/auth-shell'
 import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
 
 const supabase = getSupabaseBrowserClient()
 
 export default function Login() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -17,171 +22,119 @@ export default function Login() {
       setError('Please enter your email and password.')
       return
     }
+
     setLoading(true)
     const { error: loginError } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
     setLoading(false)
+
     if (loginError) {
       setError('Invalid email or password. Please try again.')
     } else {
-      window.location.href = '/dashboard'
+      router.push('/dashboard')
     }
   }
 
-  const inputStyle = {
-    width: '100%',
-    padding: '12px 16px',
-    backgroundColor: 'rgba(255,255,255,0.07)',
-    border: '1px solid rgba(200,164,74,0.3)',
-    borderRadius: '8px',
-    color: '#fff',
-    fontSize: '15px',
-    boxSizing: 'border-box' as const,
-    outline: 'none',
-  }
-
   return (
-    <main style={{
-      backgroundColor: '#0F1F3D',
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontFamily: 'Segoe UI, sans-serif',
-      padding: '20px',
-    }}>
-      <div style={{
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(200,164,74,0.3)',
-        borderRadius: '16px',
-        padding: '48px 40px',
-        width: '100%',
-        maxWidth: '440px',
-      }}>
+    <AuthShell
+      eyebrow="Returning Aspirants"
+      title="Welcome back to your preparation workspace"
+      subtitle="Pick up where you left off, generate fresh practice from your notes, and keep your study momentum alive."
+      footer={
+        <p className="text-center">
+          Don&apos;t have an account?{' '}
+          <Link
+            href="/signup"
+            className="font-semibold text-[#8B6914] transition hover:text-[#6A4E10]"
+          >
+            Create Account
+          </Link>
+        </p>
+      }
+    >
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8B6914]">
+          Sign In
+        </p>
+        <h2 className="mt-3 text-3xl font-semibold text-slate-900">
+          Continue your ExamAI journey
+        </h2>
+        <p className="mt-3 text-sm leading-6 text-slate-600">
+          Sign in to access your dashboard, saved quizzes, and your growing
+          notes-to-MCQ workflow.
+        </p>
+      </div>
 
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <Link href="/" style={{
-            fontSize: '32px',
-            fontWeight: 'bold',
-            color: '#C8A44A',
-            textDecoration: 'none',
-            letterSpacing: '2px',
-          }}>ExamAI</Link>
-          <p style={{ color: '#888', marginTop: '8px', fontSize: '15px' }}>
-            Welcome back. Continue your preparation.
-          </p>
-        </div>
-
-        {/* Error */}
+      <div className="mt-8 space-y-5">
         {error && (
-          <div style={{
-            backgroundColor: 'rgba(220,50,50,0.15)',
-            border: '1px solid rgba(220,50,50,0.4)',
-            borderRadius: '8px',
-            padding: '12px 16px',
-            color: '#ff6b6b',
-            fontSize: '14px',
-            marginBottom: '20px',
-          }}>{error}</div>
+          <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {error}
+          </div>
         )}
 
-        {/* Email */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{
-            color: '#aaa',
-            fontSize: '13px',
-            display: 'block',
-            marginBottom: '6px',
-          }}>Email Address</label>
+        <div className="space-y-2">
+          <label
+            htmlFor="email"
+            className="block text-sm font-semibold text-slate-900"
+          >
+            Email Address
+          </label>
           <input
+            id="email"
             type="email"
             value={email}
-            onChange={e => setEmail(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleLogin()}
+            onChange={(event) => setEmail(event.target.value)}
+            onKeyDown={(event) => event.key === 'Enter' && handleLogin()}
             placeholder="you@example.com"
-            style={inputStyle}
+            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 outline-none transition focus:border-[#C8A44A] focus:bg-white focus:ring-4 focus:ring-[#C8A44A]/15"
           />
         </div>
 
-        {/* Password */}
-        <div style={{ marginBottom: '8px' }}>
-          <label style={{
-            color: '#aaa',
-            fontSize: '13px',
-            display: 'block',
-            marginBottom: '6px',
-          }}>Password</label>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-3">
+            <label
+              htmlFor="password"
+              className="block text-sm font-semibold text-slate-900"
+            >
+              Password
+            </label>
+            <span className="text-xs font-medium uppercase tracking-[0.16em] text-slate-400">
+              Secure Access
+            </span>
+          </div>
           <input
+            id="password"
             type="password"
             value={password}
-            onChange={e => setPassword(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleLogin()}
+            onChange={(event) => setPassword(event.target.value)}
+            onKeyDown={(event) => event.key === 'Enter' && handleLogin()}
             placeholder="Your password"
-            style={inputStyle}
+            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 outline-none transition focus:border-[#C8A44A] focus:bg-white focus:ring-4 focus:ring-[#C8A44A]/15"
           />
         </div>
 
-        {/* Forgot Password */}
-        <div style={{ textAlign: 'right', marginBottom: '24px' }}>
-          <Link href="/forgot-password" style={{
-            color: '#C8A44A',
-            fontSize: '13px',
-            textDecoration: 'none',
-          }}>Forgot password?</Link>
-        </div>
-
-        {/* Login Button */}
         <button
           onClick={handleLogin}
           disabled={loading}
-          style={{
-            width: '100%',
-            padding: '14px',
-            backgroundColor: loading ? '#8B6914' : '#C8A44A',
-            color: '#0F1F3D',
-            border: 'none',
-            borderRadius: '8px',
-            fontWeight: 'bold',
-            fontSize: '16px',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            marginBottom: '20px',
-          }}
+          className="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-[#C8A44A] px-6 py-4 text-base font-semibold text-[#0F1F3D] shadow-[0_20px_40px_rgba(200,164,74,0.24)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-70"
         >
-          {loading ? 'Logging in...' : 'Login →'}
+          {loading ? (
+            <>
+              <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-[#0F1F3D]/25 border-t-[#0F1F3D]" />
+              Logging in...
+            </>
+          ) : (
+            'Sign In'
+          )}
         </button>
 
-        {/* Divider */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          marginBottom: '20px',
-        }}>
-          <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(200,164,74,0.2)' }} />
-          <span style={{ color: '#555', fontSize: '13px' }}>or</span>
-          <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(200,164,74,0.2)' }} />
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
+          Need a new account? Create one in a minute and you&apos;ll land on
+          your dashboard right after login.
         </div>
-
-        {/* Sign Up Link */}
-        <p style={{
-          textAlign: 'center',
-          color: '#888',
-          fontSize: '14px',
-          margin: 0,
-        }}>
-          Don&apos;t have an account?{' '}
-          <Link href="/signup" style={{
-            color: '#C8A44A',
-            textDecoration: 'none',
-            fontWeight: 'bold',
-          }}>Create Account</Link>
-        </p>
-
       </div>
-    </main>
+    </AuthShell>
   )
 }
-
