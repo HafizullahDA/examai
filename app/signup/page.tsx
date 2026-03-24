@@ -1,24 +1,28 @@
 'use client'
+
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+
+import AuthShell from '@/components/auth/auth-shell'
 import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
 
 const supabase = getSupabaseBrowserClient()
 
 export default function SignUp() {
+  const router = useRouter()
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
-  const [exam, setExam] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
   async function handleSignUp() {
     setError('')
-    if (!fullName || !email || !password || !exam) {
-      setError('Please fill all fields and select an exam.')
+    if (!fullName || !email || !password) {
+      setError('Please fill all required fields.')
       return
     }
     if (password !== confirm) {
@@ -29,15 +33,17 @@ export default function SignUp() {
       setError('Password must be at least 6 characters.')
       return
     }
+
     setLoading(true)
     const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName, exam_preference: exam }
-      }
+        data: { full_name: fullName },
+      },
     })
     setLoading(false)
+
     if (signUpError) {
       setError(signUpError.message)
     } else {
@@ -47,199 +53,179 @@ export default function SignUp() {
 
   if (success) {
     return (
-      <main style={{
-        backgroundColor: '#0F1F3D', minHeight: '100vh',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontFamily: 'Segoe UI, sans-serif', padding: '20px'
-      }}>
-        <div style={{
-          backgroundColor: 'rgba(255,255,255,0.05)',
-          border: '1px solid #C8A44A', borderRadius: '16px',
-          padding: '60px 40px', textAlign: 'center', maxWidth: '480px'
-        }}>
-          <div style={{ fontSize: '48px', marginBottom: '20px' }}>🎉</div>
-          <h2 style={{ color: '#C8A44A', fontSize: '28px', fontWeight: 'bold', marginBottom: '12px' }}>
-            Account Created!
-          </h2>
-          <p style={{ color: '#aaa', marginBottom: '30px' }}>
-            Check your email to confirm your account. Then you can log in.
+      <AuthShell
+        eyebrow="Account Ready"
+        title="Your account has been created"
+        subtitle="One last step: confirm your email, then sign in and head to your dashboard."
+        footer={
+          <p className="text-center">
+            Returning already?{' '}
+            <Link
+              href="/login"
+              className="font-semibold text-[#8B6914] transition hover:text-[#6A4E10]"
+            >
+              Go to Login
+            </Link>
           </p>
-          <Link href="/login" style={{
-            backgroundColor: '#C8A44A', color: '#0F1F3D',
-            padding: '14px 32px', borderRadius: '8px',
-            fontWeight: 'bold', textDecoration: 'none', fontSize: '16px'
-          }}>Go to Login</Link>
+        }
+      >
+        <div className="text-center">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#FFF8E7] text-3xl font-semibold text-[#8B6914]">
+            OK
+          </div>
+          <h2 className="mt-6 text-3xl font-semibold text-slate-900">
+            Check your inbox
+          </h2>
+          <p className="mt-4 text-sm leading-7 text-slate-600">
+            We&apos;ve sent a confirmation email. Once you verify your account,
+            sign in to start generating practice from your notes.
+          </p>
+          <Link
+            href="/login"
+            className="mt-8 inline-flex rounded-2xl bg-[#C8A44A] px-6 py-4 text-base font-semibold text-[#0F1F3D] shadow-[0_20px_40px_rgba(200,164,74,0.24)] transition hover:brightness-105"
+          >
+            Go to Login
+          </Link>
         </div>
-      </main>
+      </AuthShell>
     )
   }
 
   return (
-    <main style={{
-      backgroundColor: '#0F1F3D', minHeight: '100vh',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: 'Segoe UI, sans-serif', padding: '20px'
-    }}>
-      <div style={{
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(200,164,74,0.3)',
-        borderRadius: '16px', padding: '48px 40px',
-        width: '100%', maxWidth: '480px'
-      }}>
-
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <Link href="/" style={{
-            fontSize: '32px', fontWeight: 'bold',
-            color: '#C8A44A', textDecoration: 'none', letterSpacing: '2px'
-          }}>ExamAI</Link>
-          <p style={{ color: '#888', marginTop: '8px', fontSize: '15px' }}>
-            Create your free account
-          </p>
-        </div>
-
-        {/* Error */}
-        {error && (
-          <div style={{
-            backgroundColor: 'rgba(220,50,50,0.15)',
-            border: '1px solid rgba(220,50,50,0.4)',
-            borderRadius: '8px', padding: '12px 16px',
-            color: '#ff6b6b', fontSize: '14px', marginBottom: '20px'
-          }}>{error}</div>
-        )}
-
-        {/* Full Name */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ color: '#aaa', fontSize: '13px', display: 'block', marginBottom: '6px' }}>
-            Full Name
-          </label>
-          <input
-            type="text"
-            value={fullName}
-            onChange={e => setFullName(e.target.value)}
-            placeholder="Hafizullah Lone"
-            style={{
-              width: '100%', padding: '12px 16px',
-              backgroundColor: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(200,164,74,0.3)',
-              borderRadius: '8px', color: '#fff',
-              fontSize: '15px', boxSizing: 'border-box' as const,
-              outline: 'none'
-            }}
-          />
-        </div>
-
-        {/* Email */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ color: '#aaa', fontSize: '13px', display: 'block', marginBottom: '6px' }}>
-            Email Address
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            style={{
-              width: '100%', padding: '12px 16px',
-              backgroundColor: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(200,164,74,0.3)',
-              borderRadius: '8px', color: '#fff',
-              fontSize: '15px', boxSizing: 'border-box' as const,
-              outline: 'none'
-            }}
-          />
-        </div>
-
-        {/* Password */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ color: '#aaa', fontSize: '13px', display: 'block', marginBottom: '6px' }}>
-            Password
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            placeholder="Minimum 6 characters"
-            style={{
-              width: '100%', padding: '12px 16px',
-              backgroundColor: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(200,164,74,0.3)',
-              borderRadius: '8px', color: '#fff',
-              fontSize: '15px', boxSizing: 'border-box' as const,
-              outline: 'none'
-            }}
-          />
-        </div>
-
-        {/* Confirm Password */}
-        <div style={{ marginBottom: '24px' }}>
-          <label style={{ color: '#aaa', fontSize: '13px', display: 'block', marginBottom: '6px' }}>
-            Confirm Password
-          </label>
-          <input
-            type="password"
-            value={confirm}
-            onChange={e => setConfirm(e.target.value)}
-            placeholder="Repeat your password"
-            style={{
-              width: '100%', padding: '12px 16px',
-              backgroundColor: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(200,164,74,0.3)',
-              borderRadius: '8px', color: '#fff',
-              fontSize: '15px', boxSizing: 'border-box' as const,
-              outline: 'none'
-            }}
-          />
-        </div>
-
-        {/* Exam Selector */}
-        <div style={{ marginBottom: '28px' }}>
-          <label style={{ color: '#aaa', fontSize: '13px', display: 'block', marginBottom: '10px' }}>
-            Select Your Exam
-          </label>
-          <div style={{ display: 'flex', gap: '12px' }}>
-            {['UPSC Civil Services', 'SSC CGL'].map(e => (
-              <button
-                key={e}
-                onClick={() => setExam(e)}
-                style={{
-                  flex: 1, padding: '12px',
-                  backgroundColor: exam === e ? '#C8A44A' : 'rgba(255,255,255,0.05)',
-                  border: exam === e ? '2px solid #C8A44A' : '2px solid rgba(200,164,74,0.3)',
-                  borderRadius: '8px',
-                  color: exam === e ? '#0F1F3D' : '#ccc',
-                  fontWeight: exam === e ? 'bold' : 'normal',
-                  cursor: 'pointer', fontSize: '14px'
-                }}
-              >{e}</button>
-            ))}
-          </div>
-        </div>
-
-        {/* Submit Button */}
-        <button
-          onClick={handleSignUp}
-          disabled={loading}
-          style={{
-            width: '100%', padding: '14px',
-            backgroundColor: loading ? '#8B6914' : '#C8A44A',
-            color: '#0F1F3D', border: 'none',
-            borderRadius: '8px', fontWeight: 'bold',
-            fontSize: '16px', cursor: loading ? 'not-allowed' : 'pointer'
-          }}
-        >
-          {loading ? 'Creating Account...' : 'Create Account →'}
-        </button>
-
-        {/* Login Link */}
-        <p style={{ textAlign: 'center', marginTop: '20px', color: '#888', fontSize: '14px' }}>
+    <AuthShell
+      eyebrow="Join ExamAI"
+      title="Create a clean, focused study workspace"
+      subtitle="Set up your account once and unlock a faster way to turn notes into meaningful practice."
+      footer={
+        <p className="text-center">
           Already have an account?{' '}
-          <Link href="/login" style={{ color: '#C8A44A', textDecoration: 'none', fontWeight: 'bold' }}>
+          <Link
+            href="/login"
+            className="font-semibold text-[#8B6914] transition hover:text-[#6A4E10]"
+          >
             Login
           </Link>
         </p>
-
+      }
+    >
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8B6914]">
+          Sign Up
+        </p>
+        <h2 className="mt-3 text-3xl font-semibold text-slate-900">
+          Create your free account
+        </h2>
+        <p className="mt-3 text-sm leading-6 text-slate-600">
+          Your dashboard, saved quiz history, and future notes-to-MCQ workflow
+          will stay connected to this account.
+        </p>
       </div>
-    </main>
+
+      <div className="mt-8 space-y-5">
+        {error && (
+          <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {error}
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <label
+            htmlFor="fullName"
+            className="block text-sm font-semibold text-slate-900"
+          >
+            Full Name
+          </label>
+          <input
+            id="fullName"
+            type="text"
+            value={fullName}
+            onChange={(event) => setFullName(event.target.value)}
+            placeholder="Your full name"
+            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 outline-none transition focus:border-[#C8A44A] focus:bg-white focus:ring-4 focus:ring-[#C8A44A]/15"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label
+            htmlFor="email"
+            className="block text-sm font-semibold text-slate-900"
+          >
+            Email Address
+          </label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="you@example.com"
+            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 outline-none transition focus:border-[#C8A44A] focus:bg-white focus:ring-4 focus:ring-[#C8A44A]/15"
+          />
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="space-y-2">
+            <label
+              htmlFor="password"
+              className="block text-sm font-semibold text-slate-900"
+            >
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Minimum 6 characters"
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 outline-none transition focus:border-[#C8A44A] focus:bg-white focus:ring-4 focus:ring-[#C8A44A]/15"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label
+              htmlFor="confirmPassword"
+              className="block text-sm font-semibold text-slate-900"
+            >
+              Confirm Password
+            </label>
+            <input
+              id="confirmPassword"
+              type="password"
+              value={confirm}
+              onChange={(event) => setConfirm(event.target.value)}
+              placeholder="Repeat your password"
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 outline-none transition focus:border-[#C8A44A] focus:bg-white focus:ring-4 focus:ring-[#C8A44A]/15"
+            />
+          </div>
+        </div>
+
+        <button
+          onClick={handleSignUp}
+          disabled={loading}
+          className="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-[#C8A44A] px-6 py-4 text-base font-semibold text-[#0F1F3D] shadow-[0_20px_40px_rgba(200,164,74,0.24)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          {loading ? (
+            <>
+              <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-[#0F1F3D]/25 border-t-[#0F1F3D]" />
+              Creating account...
+            </>
+          ) : (
+            'Create Account'
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => router.push('/login')}
+          className="inline-flex w-full items-center justify-center rounded-2xl border border-slate-200 px-6 py-4 text-base font-medium text-slate-700 transition hover:bg-slate-50"
+        >
+          I already have an account
+        </button>
+
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
+          You&apos;ll choose your target exam inside the quiz workflow when you
+          upload notes or paste study material.
+        </div>
+      </div>
+    </AuthShell>
   )
-} 
+}
