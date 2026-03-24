@@ -1,246 +1,128 @@
-'use client'
-import { useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import Link from 'next/link'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
-
-export default function SignUp() {
-  const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirm, setConfirm] = useState('')
-  const [exam, setExam] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
-
-  async function handleSignUp() {
-    setError('')
-    if (!fullName || !email || !password || !exam) {
-      setError('Please fill all fields and select an exam.')
-      return
-    }
-    if (password !== confirm) {
-      setError('Passwords do not match.')
-      return
-    }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.')
-      return
-    }
-    setLoading(true)
-    const { error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName, exam_preference: exam }
-      }
-    })
-    setLoading(false)
-    if (signUpError) {
-      setError(signUpError.message)
-    } else {
-      setSuccess(true)
-    }
-  }
-
-  if (success) {
-    return (
-      <main style={{
-        backgroundColor: '#0F1F3D', minHeight: '100vh',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontFamily: 'Segoe UI, sans-serif', padding: '20px'
-      }}>
-        <div style={{
-          backgroundColor: 'rgba(255,255,255,0.05)',
-          border: '1px solid #C8A44A', borderRadius: '16px',
-          padding: '60px 40px', textAlign: 'center', maxWidth: '480px'
-        }}>
-          <div style={{ fontSize: '48px', marginBottom: '20px' }}>🎉</div>
-          <h2 style={{ color: '#C8A44A', fontSize: '28px', fontWeight: 'bold', marginBottom: '12px' }}>
-            Account Created!
-          </h2>
-          <p style={{ color: '#aaa', marginBottom: '30px' }}>
-            Check your email to confirm your account. Then you can log in.
-          </p>
-          <a href="/login" style={{
-            backgroundColor: '#C8A44A', color: '#0F1F3D',
-            padding: '14px 32px', borderRadius: '8px',
-            fontWeight: 'bold', textDecoration: 'none', fontSize: '16px'
-          }}>Go to Login</a>
-        </div>
-      </main>
-    )
-  }
-
+export default function HomePage() {
   return (
-    <main style={{
-      backgroundColor: '#0F1F3D', minHeight: '100vh',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: 'Segoe UI, sans-serif', padding: '20px'
-    }}>
-      <div style={{
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(200,164,74,0.3)',
-        borderRadius: '16px', padding: '48px 40px',
-        width: '100%', maxWidth: '480px'
-      }}>
+    <main className="min-h-screen overflow-hidden bg-[#0F1F3D] text-white">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(200,164,74,0.22),_transparent_30%),radial-gradient(circle_at_80%_20%,_rgba(255,255,255,0.08),_transparent_22%)]" />
 
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <a href="/" style={{
-            fontSize: '32px', fontWeight: 'bold',
-            color: '#C8A44A', textDecoration: 'none', letterSpacing: '2px'
-          }}>ExamAI</a>
-          <p style={{ color: '#888', marginTop: '8px', fontSize: '15px' }}>
-            Create your free account
-          </p>
-        </div>
+      <div className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-5 py-6 sm:px-8 lg:px-12">
+        <header className="flex items-center justify-between py-2">
+          <Link
+            href="/"
+            className="text-2xl font-bold tracking-[0.18em] text-[#C8A44A] sm:text-3xl"
+          >
+            ExamAI
+          </Link>
 
-        {/* Error */}
-        {error && (
-          <div style={{
-            backgroundColor: 'rgba(220,50,50,0.15)',
-            border: '1px solid rgba(220,50,50,0.4)',
-            borderRadius: '8px', padding: '12px 16px',
-            color: '#ff6b6b', fontSize: '14px', marginBottom: '20px'
-          }}>{error}</div>
-        )}
-
-        {/* Full Name */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ color: '#aaa', fontSize: '13px', display: 'block', marginBottom: '6px' }}>
-            Full Name
-          </label>
-          <input
-            type="text"
-            value={fullName}
-            onChange={e => setFullName(e.target.value)}
-            placeholder="Hafizullah Lone"
-            style={{
-              width: '100%', padding: '12px 16px',
-              backgroundColor: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(200,164,74,0.3)',
-              borderRadius: '8px', color: '#fff',
-              fontSize: '15px', boxSizing: 'border-box' as const,
-              outline: 'none'
-            }}
-          />
-        </div>
-
-        {/* Email */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ color: '#aaa', fontSize: '13px', display: 'block', marginBottom: '6px' }}>
-            Email Address
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            style={{
-              width: '100%', padding: '12px 16px',
-              backgroundColor: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(200,164,74,0.3)',
-              borderRadius: '8px', color: '#fff',
-              fontSize: '15px', boxSizing: 'border-box' as const,
-              outline: 'none'
-            }}
-          />
-        </div>
-
-        {/* Password */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ color: '#aaa', fontSize: '13px', display: 'block', marginBottom: '6px' }}>
-            Password
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            placeholder="Minimum 6 characters"
-            style={{
-              width: '100%', padding: '12px 16px',
-              backgroundColor: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(200,164,74,0.3)',
-              borderRadius: '8px', color: '#fff',
-              fontSize: '15px', boxSizing: 'border-box' as const,
-              outline: 'none'
-            }}
-          />
-        </div>
-
-        {/* Confirm Password */}
-        <div style={{ marginBottom: '24px' }}>
-          <label style={{ color: '#aaa', fontSize: '13px', display: 'block', marginBottom: '6px' }}>
-            Confirm Password
-          </label>
-          <input
-            type="password"
-            value={confirm}
-            onChange={e => setConfirm(e.target.value)}
-            placeholder="Repeat your password"
-            style={{
-              width: '100%', padding: '12px 16px',
-              backgroundColor: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(200,164,74,0.3)',
-              borderRadius: '8px', color: '#fff',
-              fontSize: '15px', boxSizing: 'border-box' as const,
-              outline: 'none'
-            }}
-          />
-        </div>
-
-        {/* Exam Selector */}
-        <div style={{ marginBottom: '28px' }}>
-          <label style={{ color: '#aaa', fontSize: '13px', display: 'block', marginBottom: '10px' }}>
-            Select Your Exam
-          </label>
-          <div style={{ display: 'flex', gap: '12px' }}>
-            {['UPSC Civil Services', 'SSC CGL'].map(e => (
-              <button
-                key={e}
-                onClick={() => setExam(e)}
-                style={{
-                  flex: 1, padding: '12px',
-                  backgroundColor: exam === e ? '#C8A44A' : 'rgba(255,255,255,0.05)',
-                  border: exam === e ? '2px solid #C8A44A' : '2px solid rgba(200,164,74,0.3)',
-                  borderRadius: '8px',
-                  color: exam === e ? '#0F1F3D' : '#ccc',
-                  fontWeight: exam === e ? 'bold' : 'normal',
-                  cursor: 'pointer', fontSize: '14px'
-                }}
-              >{e}</button>
-            ))}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/login"
+              className="rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/8"
+            >
+              Login
+            </Link>
+            <Link
+              href="/signup"
+              className="rounded-full bg-[#C8A44A] px-4 py-2 text-sm font-semibold text-[#0F1F3D] transition hover:brightness-105"
+            >
+              Create Account
+            </Link>
           </div>
-        </div>
+        </header>
 
-        {/* Submit Button */}
-        <button
-          onClick={handleSignUp}
-          disabled={loading}
-          style={{
-            width: '100%', padding: '14px',
-            backgroundColor: loading ? '#8B6914' : '#C8A44A',
-            color: '#0F1F3D', border: 'none',
-            borderRadius: '8px', fontWeight: 'bold',
-            fontSize: '16px', cursor: loading ? 'not-allowed' : 'pointer'
-          }}
-        >
-          {loading ? 'Creating Account...' : 'Create Account →'}
-        </button>
+        <section className="flex flex-1 items-center py-10 sm:py-14 lg:py-20">
+          <div className="grid w-full items-center gap-10 lg:grid-cols-[1.15fr_0.85fr]">
+            <div className="max-w-3xl">
+              <span className="inline-flex rounded-full border border-[#C8A44A]/30 bg-[#C8A44A]/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#E3C97B]">
+                Notes to MCQs
+              </span>
 
-        {/* Login Link */}
-        <p style={{ textAlign: 'center', marginTop: '20px', color: '#888', fontSize: '14px' }}>
-          Already have an account?{' '}
-          <a href="/login" style={{ color: '#C8A44A', textDecoration: 'none', fontWeight: 'bold' }}>
-            Login
-          </a>
-        </p>
+              <h1 className="mt-6 text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
+                Turn your notes into exam-style questions instantly
+              </h1>
 
+              <p className="mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
+                ExamAI helps aspirants paste study notes or upload PDFs and
+                handwritten pages, then generate focused practice questions in a
+                style that matches their selected exam.
+              </p>
+
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center justify-center rounded-2xl bg-[#C8A44A] px-6 py-4 text-base font-semibold text-[#0F1F3D] shadow-[0_20px_40px_rgba(200,164,74,0.25)] transition hover:brightness-105"
+                >
+                  Start Free
+                </Link>
+                <Link
+                  href="/login"
+                  className="inline-flex items-center justify-center rounded-2xl border border-white/15 px-6 py-4 text-base font-medium text-white transition hover:bg-white/8"
+                >
+                  I already have an account
+                </Link>
+              </div>
+
+              <div className="mt-10 grid gap-4 text-sm text-slate-300 sm:grid-cols-3">
+                <div className="rounded-3xl border border-white/10 bg-white/6 p-4 backdrop-blur">
+                  Paste notes or upload files
+                </div>
+                <div className="rounded-3xl border border-white/10 bg-white/6 p-4 backdrop-blur">
+                  Choose exam, style, and difficulty
+                </div>
+                <div className="rounded-3xl border border-white/10 bg-white/6 p-4 backdrop-blur">
+                  Practice with instant explanations
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[32px] border border-white/10 bg-white/6 p-5 shadow-[0_40px_100px_rgba(0,0,0,0.25)] backdrop-blur sm:p-6">
+              <div className="rounded-[28px] border border-[#C8A44A]/20 bg-white p-5 text-slate-900 sm:p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8B6914]">
+                      Demo Flow
+                    </p>
+                    <h2 className="mt-2 text-2xl font-semibold">
+                      From notes to practice
+                    </h2>
+                  </div>
+                  <div className="rounded-full bg-[#FFF8E7] px-3 py-2 text-xs font-semibold text-[#8B6914]">
+                    AI Powered
+                  </div>
+                </div>
+
+                <div className="mt-6 space-y-4">
+                  <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-sm font-semibold text-slate-900">
+                      1. Add your notes
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                      Paste text or upload a PDF/image of your study material.
+                    </p>
+                  </div>
+
+                  <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-sm font-semibold text-slate-900">
+                      2. Set your quiz
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                      Pick exam, difficulty, question count, and question style.
+                    </p>
+                  </div>
+
+                  <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-sm font-semibold text-slate-900">
+                      3. Practice smarter
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                      Review generated questions one by one with explanations.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </main>
   )
